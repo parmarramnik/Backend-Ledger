@@ -1,18 +1,12 @@
 const express = require('express')
 const cookieParser = require('cookie-parser')
 
-/**
- * Routes required for the application
- */
 const authRouter = require('./routes/auth.routes')
 const accountRouter = require('./routes/account.routes')
 const transactionRouter = require('./routes/transaction.routes')
 
 const app = express()
 
-/** 
- * use routes
- */
 app.use(express.json())
 app.use(cookieParser())
 

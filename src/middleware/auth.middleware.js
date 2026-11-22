@@ -1,12 +1,23 @@
 const userModel = require('../models/user.model')
 const jwt = require('jsonwebtoken')
+const tokenBlacklistModel = require('../models/blacklist.model')
 
 async function authMiddleware(req, res, next){
-    const token = req.cookies.token || req.headers.authorization?.split(' ')[1]
+    const token = req.headers.authorization?.split(' ')[1] || req.cookies.token
 
     if(!token){
         return res.status(401).json({
             message: 'Unauthorized access. Token is missing',
+        })
+    }
+
+    const isTokenBlacklisted = await tokenBlacklistModel.findOne({
+        token: token
+    })
+
+    if(isTokenBlacklisted){
+        return res.status(401).json({
+            message: 'Unauthorized access. Token is blacklisted',
         })
     }
 
@@ -19,20 +30,30 @@ async function authMiddleware(req, res, next){
         
         return next()
 
-    }catch(err){
+    }catch (err) {
         return res.status(401).json({
-            message: 'Unauthorized access. Token is invalid',
+            message: 'Unauthorized access. Token is invalid'
         })
     }
 }
 
 async function authsystemUserMiddleware(req, res, next){
 
-    const token = req.cookies.token || req.headers.authorization?.split(' ')[1]
+const token = req.headers.authorization?.split(' ')[1] || req.cookies.token
 
     if(!token){
         return res.status(401).json({
             message: 'Unauthorized access. Token is missing',
+        })
+    }
+
+    const isTokenBlacklisted = await tokenBlacklistModel.findOne({
+        token: token
+    })
+
+    if(isTokenBlacklisted){
+        return res.status(401).json({
+            message: 'Unauthorized access. Token is blacklisted',
         })
     }
 
@@ -51,9 +72,9 @@ async function authsystemUserMiddleware(req, res, next){
        
         next()
 
-    }catch(err){
+    }catch (err) {
         return res.status(401).json({
-            message: 'Unauthorized access. Token is invalid',
+            message: 'Unauthorized access. Token is invalid'
         })
     }
 }
